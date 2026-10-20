@@ -1,0 +1,590 @@
+/* ==========================
+   Google Font
+========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+    scroll-behavior:smooth;
+}
+
+/* ==========================
+   Body
+========================== */
+
+body{
+
+    background:#eef7fc;
+
+}
+
+/* ==========================
+   Navbar
+========================== */
+
+header{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 70px;
+
+    background:rgba(255,255,255,.88);
+
+    backdrop-filter:blur(12px);
+
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+    z-index:1000;
+
+}
+
+.logo{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#0b74c4;
+
+}
+
+nav{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:28px;
+
+}
+
+nav a{
+
+    text-decoration:none;
+
+    color:#333;
+
+    font-size:16px;
+
+    font-weight:500;
+
+    transition:.3s;
+
+}
+
+nav a:hover{
+
+    color:#0b74c4;
+
+}
+
+#loginBtn{
+
+    background:#0b74c4;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 22px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+#loginBtn:hover{
+
+    background:#095ea2;
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================
+Hero
+========================== */
+
+.hero{
+
+    height:100vh;
+
+    background:url("../images/hospital.jpg");
+
+    background-size:cover;
+
+    background-position:center;
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+.overlay{
+
+    width:100%;
+    height:100%;
+
+    background:rgba(255,255,255,.70);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:160px 100px 80px;
+
+}
+
+.hero-left{
+
+    width:50%;
+
+}
+
+.hero-left h1{
+
+    font-size:52px;
+
+    color:#0b74c4;
+
+    line-height:65px;
+
+}
+
+.hero-left p{
+
+    margin-top:25px;
+
+    font-size:20px;
+
+    color:#444;
+
+    line-height:35px;
+
+}
+
+.hero-buttons{
+
+    display:flex;
+
+    gap:20px;
+
+    margin-top:35px;
+
+}
+
+.learn-btn{
+
+    text-decoration:none;
+
+    background:white;
+
+    color:#0b74c4;
+
+    padding:15px 28px;
+
+    border-radius:8px;
+
+    border:2px solid #0b74c4;
+
+    transition:.3s;
+
+}
+
+.learn-btn:hover{
+
+    background:#0b74c4;
+
+    color:white;
+
+}
+
+.hero-right{
+
+    width:45%;
+
+    display:flex;
+
+    justify-content:center;
+
+}
+
+.hero-right img{
+
+    width:90%;
+
+}
+
+
+/* ==========================
+About & Contact
+========================== */
+
+/* ==========================
+   About & Contact
+========================== */
+
+.about,
+.contact{
+
+    padding:40px 80px;
+
+    background:white;
+
+}
+
+.about h2,
+.contact h2{
+
+    text-align:center;
+
+    color:#0b74c4;
+
+    font-size:38px;
+
+    margin-bottom:20px;
+
+}
+
+.about p,
+.contact p{
+
+    max-width:900px;
+
+    margin:auto;
+
+    text-align:center;
+
+    color:#555;
+
+    font-size:17px;
+
+    line-height:30px;
+
+}
+
+.contact{
+
+    padding-top:20px;
+
+    padding-bottom:50px;
+
+}
+
+.contact p{
+
+    margin-top:10px;
+
+}
+/* ==========================
+Modal
+========================== */
+
+.modal{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,.5);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.modal-content{
+
+    background:white;
+
+    width:380px;
+
+    padding:30px;
+
+    border-radius:15px;
+
+    position:relative;
+
+}
+
+.close{
+
+    position:absolute;
+
+    right:20px;
+
+    top:15px;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+}
+
+.modal input{
+
+    width:100%;
+
+    padding:12px;
+
+    margin:10px 0;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+}
+
+.login-submit{
+
+    width:100%;
+
+    padding:12px;
+
+    background:#0b74c4;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.modal p{
+
+    text-align:center;
+
+    margin-top:15px;
+
+}
+/* ==========================
+Card
+========================== */
+
+.card{
+
+    width:430px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:40px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+    animation:popup .3s ease;
+
+}
+
+@keyframes popup{
+
+    from{
+
+        transform:scale(.85);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+
+.card h2{
+
+    text-align:center;
+
+    color:#0b74c4;
+
+    margin-bottom:30px;
+
+}
+
+.card input{
+
+    width:100%;
+
+    padding:14px;
+
+    margin-bottom:18px;
+
+    border:1px solid #ccc;
+
+    border-radius:8px;
+
+    font-size:15px;
+
+}
+
+.card input:focus{
+
+    outline:none;
+
+    border-color:#0b74c4;
+
+}
+
+.card button{
+
+    width:100%;
+
+    padding:14px;
+
+    background:#0b74c4;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:17px;
+
+    transition:.3s;
+
+}
+
+.card button:hover{
+
+    background:#095ea2;
+
+}
+
+.card p{
+
+    margin-top:20px;
+
+    text-align:center;
+
+}
+
+.card span{
+
+    color:#0b74c4;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+/* ==========================
+Responsive
+========================== */
+
+@media(max-width:768px){
+
+header{
+
+    flex-direction:column;
+
+    gap:15px;
+
+    padding:20px;
+
+}
+
+nav{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+}
+
+.overlay h1{
+
+    font-size:34px;
+
+}
+
+.overlay p{
+
+    font-size:17px;
+
+}
+
+.card{
+
+    width:92%;
+
+}
+
+.about,
+.contact{
+
+    padding:70px 25px;
+
+}
+
+}
+
+.start-btn{
+
+    display:inline-block;
+
+    text-decoration:none;
+
+    background:#0b74c4;
+
+    color:white;
+
+    padding:16px 35px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+    transition:.3s;
+
+}
+
+.start-btn:hover{
+
+    background:#095ea2;
+
+    transform:translateY(-3px);
+
+}

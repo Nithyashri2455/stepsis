@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History - Sepsis CDSS</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        medical: {
+                            blue: '#0c6cbf',
+                            dark: '#073966',
+                            light: '#f0f7ff',
+                            accent: '#00d2ff',
+                            slate: '#0f172a'
+                        }
+                    },
+                    backgroundImage: {
+                        'header-glow': "radial-gradient(circle at 50% 0%, rgba(29, 196, 233, 0.25), transparent 70%)"
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="font-sans text-slate-700 antialiased min-h-screen flex flex-col justify-between relative selection:bg-medical-blue selection:text-white">
+
+    <!-- ==========================
+            Background Video Overlay
+    =========================== -->
+    <div class="fixed inset-0 -z-20 overflow-hidden">
+        <video autoplay loop muted playsinline class="w-full h-full object-cover">
+            <source src="{{ url_for('static', filename='videos/background.mp4') }}" type="video/mp4">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-animation-of-blue-lights-and-lines-41553-large.mp4" type="video/mp4">
+        </video>
+        <!-- Dark tint overlay for optimal contrast and readability -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-[3px]"></div>
+    </div>
+
+    <!-- Ambient Glowing Background Elements -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <!-- ==========================
+            Top Header Navigation
+    =========================== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- App Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-medical-dark via-medical-blue to-sky-500 text-white flex items-center justify-center shadow-lg shadow-medical-blue/25 ring-2 ring-white">
+                    <i class="fa-solid fa-hospital-user text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        Sepsis Clinical Decision Support System
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Patient History & Diagnostic Database</p>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex items-center gap-3">
+                <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-medical-blue hover:text-white transition-all duration-200 shadow-sm hover:shadow-md">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="hidden sm:inline">Home</span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ==========================
+            Main History Section
+    =========================== -->
+    <main class="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl shadow-black/40 border border-white/20 overflow-hidden">
+            
+            <!-- Header Banner -->
+            <div class="relative bg-gradient-to-r from-slate-900 via-medical-dark to-medical-blue px-6 sm:px-8 py-7 text-white flex items-center justify-between overflow-hidden">
+                <div class="absolute inset-0 bg-header-glow opacity-60"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sky-200 text-xs font-semibold uppercase tracking-wider mb-2 border border-white/10">
+                        <i class="fa-solid fa-folder-open text-sky-400"></i> Records Management
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black tracking-tight">Patient History Records</h2>
+                    <p class="text-sky-100/90 text-xs sm:text-sm mt-1">Review historical clinical assessments, risk status, and download detailed reports.</p>
+                </div>
+                <div class="hidden sm:block text-5xl text-white/15 relative z-10">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+            </div>
+
+            <div class="p-6 sm:p-8 space-y-6">
+
+                <!-- Controls Bar: Search & Quick Metrics -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80">
+                    
+                    <!-- Search Field -->
+                    <div class="relative flex-grow max-w-md">
+                        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="searchInput" placeholder="Search by Patient Name or Hospital..."
+                            class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/80 focus:bg-white shadow-sm">
+                    </div>
+
+                    <!-- Counter Badge -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Records:</span>
+                        <span class="px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-slate-800 text-xs font-extrabold shadow-inner" id="recordCount">
+                            {{ patients|length }}
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- Table Container -->
+                <div class="overflow-x-auto rounded-xl border border-slate-200/80 shadow-sm">
+                    <table id="historyTable" class="w-full text-left border-collapse">
+                        
+                        <!-- Table Head -->
+                        <thead>
+                            <tr class="bg-slate-100/90 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                                <th class="py-3.5 px-4">ID</th>
+                                <th class="py-3.5 px-4">Patient</th>
+                                <th class="py-3.5 px-4">Hospital</th>
+                                <th class="py-3.5 px-4">Age / Gender</th>
+                                <th class="py-3.5 px-4">Date & Time</th>
+                                <th class="py-3.5 px-4">Sepsis Risk</th>
+                                <th class="py-3.5 px-4 text-center">Report</th>
+                            </tr>
+                        </thead>
+
+                        <!-- Table Body -->
+                        <tbody class="divide-y divide-slate-200/70 text-sm font-medium text-slate-800">
+                            {% for patient in patients %}
+                            <tr class="hover:bg-sky-50/50 transition-colors duration-150">
+                                
+                                <!-- ID -->
+                                <td class="py-3.5 px-4 font-mono text-xs text-slate-500 font-bold">
+                                    #{{ patient[0] }}
+                                </td>
+
+                                <!-- Patient Name -->
+                                <td class="py-3.5 px-4 font-semibold text-slate-900">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-full bg-medical-blue/10 text-medical-blue flex items-center justify-center font-bold text-xs">
+                                            {{ patient[1][0] | upper if patient[1] else 'P' }}
+                                        </div>
+                                        <span>{{ patient[1] }}</span>
+                                    </div>
+                                </td>
+
+                                <!-- Hospital -->
+                                <td class="py-3.5 px-4 text-slate-600">
+                                    <div class="flex items-center gap-1.5">
+                                        <i class="fa-regular fa-building text-slate-400 text-xs"></i>
+                                        <span>{{ patient[2] }}</span>
+                                    </div>
+                                </td>
+
+                                <!-- Age / Gender -->
+                                <td class="py-3.5 px-4 text-slate-600">
+                                    <span class="inline-flex items-center gap-1">
+                                        {{ patient[3] }} yrs
+                                        <span class="text-slate-300">•</span>
+                                        <span class="capitalize">{{ patient[4] }}</span>
+                                    </span>
+                                </td>
+
+                                <!-- Date & Time -->
+                                <td class="py-3.5 px-4 text-slate-500 text-xs">
+                                    <div class="font-semibold text-slate-700">{{ patient[6] }}</div>
+                                    <div class="text-[11px] text-slate-400">{{ patient[7] }}</div>
+                                </td>
+
+                                <!-- Prediction Badge -->
+                                <td class="py-3.5 px-4">
+                                    {% if patient[5] == "High Risk of Sepsis" %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200/80 shadow-sm">
+                                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                            High Risk
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200/80 shadow-sm">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                            No Sepsis
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Report Button -->
+                                <td class="py-3.5 px-4 text-center">
+                                    <a href="/download/{{ patient[0] }}" 
+                                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-medical-blue hover:text-white transition-all duration-200 shadow-sm hover:shadow">
+                                        <i class="fa-solid fa-file-arrow-down"></i>
+                                        Download
+                                    </a>
+                                </td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <!-- Empty Search Fallback State -->
+                <div id="noResults" class="hidden text-center py-12 bg-slate-50/50 rounded-xl border border-dashed border-slate-300">
+                    <i class="fa-solid fa-user-slash text-4xl text-slate-300 mb-3"></i>
+                    <p class="text-slate-600 font-bold">No matching patient records found</p>
+                    <p class="text-slate-400 text-xs mt-1">Try searching with a different name or hospital keyword.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/90 backdrop-blur-md border-t border-slate-200/80 py-4 text-center text-xs text-slate-600 font-medium mt-auto">
+        <p>© 2026 Sepsis AI Clinical Decision Support System. Confidential Healthcare Tool.</p>
+    </footer>
+
+    <!-- Real-time Filter JavaScript -->
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const rows = document.querySelectorAll("#historyTable tbody tr");
+        const noResults = document.getElementById("noResults");
+        const recordCount = document.getElementById("recordCount");
+
+        searchInput.addEventListener("keyup", function() {
+            let filter = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            rows.forEach(function(row) {
+                // Search across Patient Name (index 1) and Hospital (index 2)
+                let patientName = row.cells[1].innerText.toLowerCase();
+                let hospitalName = row.cells[2].innerText.toLowerCase();
+
+                if (patientName.includes(filter) || hospitalName.includes(filter)) {
+                    row.style.display = "";
+                    visibleCount++;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            // Update visible counter badge
+            recordCount.textContent = visibleCount;
+
+            // Toggle empty state graphic
+            if (visibleCount === 0) {
+                noResults.classList.remove("hidden");
+            } else {
+                noResults.classList.add("hidden");
+            }
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sepsis Prediction & XAI Report</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Configuration matching Clinical Palette -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        medical: {
+                            blue: '#0c6cbf',
+                            dark: '#073966',
+                            light: '#f0f7ff',
+                            accent: '#00d2ff',
+                            slate: '#0f172a'
+                        }
+                    },
+                    backgroundImage: {
+                        'header-glow': "radial-gradient(circle at 50% 0%, rgba(29, 196, 233, 0.25), transparent 70%)"
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="font-sans text-slate-700 antialiased min-h-screen flex flex-col justify-between relative selection:bg-medical-blue selection:text-white">
+
+    <!-- ==========================
+            Background Video Overlay
+    =========================== -->
+    <div class="fixed inset-0 -z-20 overflow-hidden">
+        <video autoplay loop muted playsinline class="w-full h-full object-cover">
+            <source src="{{ url_for('static', filename='videos/background.mp4') }}" type="video/mp4">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-animation-of-blue-lights-and-lines-41553-large.mp4" type="video/mp4">
+        </video>
+        <!-- Dark tint overlay to balance glassmorphism legibility -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-[3px]"></div>
+    </div>
+
+    <!-- Ambient Glowing Background Elements -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <!-- ==========================
+            Top Header
+    =========================== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- App Title -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-medical-dark via-medical-blue to-sky-500 text-white flex items-center justify-center shadow-lg shadow-medical-blue/25 ring-2 ring-white">
+                    <i class="fa-solid fa-hospital-user text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-tight">
+                        Sepsis Diagnostic Report
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">AI Diagnostic Engine & Dual XAI Interpretability</p>
+                </div>
+            </div>
+
+            <!-- Navigation Actions -->
+            <div class="flex items-center gap-3">
+                <a href="/index" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-medical-blue hover:text-white transition-all duration-200 shadow-sm hover:shadow-md">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">New Assessment</span>
+                </a>
+                <a href="/history" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-medical-blue hover:text-white transition-all duration-200 shadow-sm hover:shadow-md">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span class="hidden sm:inline">History</span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ==========================
+            Main Container
+    =========================== -->
+    <main class="container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow space-y-8">
+
+        <!-- Banner Header Card -->
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl shadow-black/40 border border-white/20 overflow-hidden">
+            <div class="relative bg-gradient-to-r from-slate-900 via-medical-dark to-medical-blue px-6 sm:px-8 py-7 text-white flex items-center justify-between overflow-hidden">
+                <div class="absolute inset-0 bg-header-glow opacity-60"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sky-200 text-xs font-semibold uppercase tracking-wider mb-2 border border-white/10">
+                        <i class="fa-solid fa-microchip text-sky-400"></i> AI Decision Output
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black tracking-tight">Sepsis Risk Assessment Report</h2>
+                    <p class="text-sky-100/90 text-xs sm:text-sm mt-1">Dual Explainable AI Engine (SHAP & LIME Interpretability Analysis)</p>
+                </div>
+                <div class="hidden sm:block text-6xl text-white/15 relative z-10">
+                    <i class="fa-solid fa-file-medical-chart"></i>
+                </div>
+            </div>
+
+            <!-- PREDICTION RESULT BOX -->
+            <div class="p-6 sm:p-8 bg-slate-50/50">
+                <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200/80 shadow-md text-center space-y-3">
+                    <p class="text-xs font-extrabold uppercase tracking-widest text-slate-400">
+                        Diagnostic Result for Patient
+                    </p>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-800">
+                        {{ patient_name }}
+                    </h3>
+                    
+                    <div class="pt-2">
+                        <!-- Preserving status_class while giving it high-impact styling -->
+                        <div class="inline-block px-6 py-3 rounded-2xl shadow-sm border border-slate-200">
+                            <h1 class="{{ status_class }} text-2xl sm:text-4xl font-black tracking-tight">
+                                {{ prediction }}
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXPLAINABLE AI VISUAL GRAPHS -->
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl shadow-black/40 border border-white/20 overflow-hidden p-6 sm:p-8 space-y-6">
+            
+            <div class="border-b border-slate-200 pb-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-medical-blue/10 text-medical-blue flex items-center justify-center text-lg shadow-inner">
+                        <i class="fa-solid fa-chart-column"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Explainable AI Graphical Insights</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">
+                            Visual contribution graphs generated using <strong class="text-slate-800">SHAP</strong> (global feature impact) and <strong class="text-slate-800">LIME</strong> (local decision boundary interpretation).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plots Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- SHAP Plot Container -->
+                <div class="bg-slate-50/90 rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-200/80 pb-3">
+                        <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+                            SHAP Contribution Plot
+                        </h4>
+                        <span class="text-[11px] font-bold text-sky-700 bg-sky-100 px-2.5 py-0.5 rounded-full">Global Impact</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-inner flex items-center justify-center min-h-[280px]">
+                        <img src="data:image/png;base64,{{ shap_plot }}" alt="SHAP Plot" class="max-w-full h-auto rounded-lg object-contain">
+                    </div>
+                </div>
+
+                <!-- LIME Plot Container -->
+                <div class="bg-slate-50/90 rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-200/80 pb-3">
+                        <h4 class="font-bold text-sm text-slate-800 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            LIME Explanation Plot
+                        </h4>
+                        <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">Local Decision</span>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-inner flex items-center justify-center min-h-[280px]">
+                        <img src="data:image/png;base64,{{ lime_plot }}" alt="LIME Plot" class="max-w-full h-auto rounded-lg object-contain">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- EXPLAINABLE AI DATA TABLE -->
+        <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl shadow-black/40 border border-white/20 overflow-hidden p-6 sm:p-8 space-y-6">
+            
+            <div class="border-b border-slate-200 pb-4">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl bg-medical-blue/10 text-medical-blue flex items-center justify-center text-lg shadow-inner">
+                        <i class="fa-solid fa-list-check"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-slate-900 tracking-tight">Feature Contribution Breakdown</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Detailed breakdown of clinical parameters and their direction of impact on the sepsis prediction.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Responsive Table Container -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200/80 shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100/90 text-slate-700 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-3.5 px-4">Feature Parameter</th>
+                            <th class="py-3.5 px-4">Measured Value</th>
+                            <th class="py-3.5 px-4">Impact on Prediction</th>
+                            <th class="py-3.5 px-4 text-right">SHAP Score</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200/70 text-sm font-medium text-slate-800">
+                        {% for item in explanation_data %}
+                        <tr class="hover:bg-sky-50/50 transition-colors duration-150">
+                            
+                            <!-- Feature -->
+                            <td class="py-3.5 px-4 font-semibold text-slate-900">
+                                <strong>{{ item.feature }}</strong>
+                            </td>
+
+                            <!-- Value -->
+                            <td class="py-3.5 px-4 font-mono text-slate-700">
+                                {{ item.value }}
+                            </td>
+
+                            <!-- Impact Badge -->
+                            <td class="py-3.5 px-4">
+                                {% if item.shap_val > 0 %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 border border-red-200/80 shadow-sm">
+                                        <i class="fa-solid fa-arrow-trend-up text-[10px]"></i>
+                                        Increases Risk
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200/80 shadow-sm">
+                                        <i class="fa-solid fa-arrow-trend-down text-[10px]"></i>
+                                        Decreases Risk
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- SHAP Score -->
+                            <td class="py-3.5 px-4 text-right font-mono font-bold text-sm {% if item.shap_val > 0 %}text-red-600{% else %}text-emerald-600{% endif %}">
+                                {{ item.shap_val }}
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-4 flex justify-center">
+                <a href="/index" class="w-full sm:w-auto">
+                    <button class="w-full sm:w-auto bg-gradient-to-r from-medical-blue via-medical-dark to-slate-900 hover:from-medical-dark hover:to-slate-900 text-white font-extrabold px-8 py-3.5 rounded-xl shadow-xl shadow-medical-blue/25 hover:shadow-2xl hover:shadow-medical-blue/40 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2.5 text-sm tracking-wider uppercase ring-1 ring-white/20">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Predict Another Patient
+                    </button>
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/90 backdrop-blur-md border-t border-slate-200/80 py-4 text-center text-xs text-slate-600 font-medium mt-auto">
+        <p>© 2026 Sepsis AI Clinical Decision Support System. Confidential Healthcare Tool.</p>
+    </footer>
+
+</body>
+
+</html>

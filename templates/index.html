@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sepsis Prediction System</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Configuration matching the Healthcare Design Palette -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        medical: {
+                            blue: '#0c6cbf',
+                            dark: '#073966',
+                            light: '#f0f7ff',
+                            accent: '#00d2ff',
+                            slate: '#0f172a'
+                        }
+                    },
+                    backgroundImage: {
+                        'header-glow': "radial-gradient(circle at 50% 0%, rgba(29, 196, 233, 0.25), transparent 70%)"
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="font-sans text-slate-700 antialiased min-h-screen flex flex-col justify-between relative selection:bg-medical-blue selection:text-white">
+
+    <!-- ==========================
+            Background Video Overlay
+    =========================== -->
+    <div class="fixed inset-0 -z-20 overflow-hidden">
+        <video autoplay loop muted playsinline class="w-full h-full object-cover">
+            <!-- Replace video source with your preferred video path or Flask url_for -->
+            <source src="{{ url_for('static', filename='videos/background.mp4') }}" type="video/mp4">
+            <!-- Fallback online medical animation link for testing -->
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-abstract-animation-of-blue-lights-and-lines-41553-large.mp4" type="video/mp4">
+        </video>
+        <!-- Dark tint overlay to maintain input field contrast and high legibility -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-[3px]"></div>
+    </div>
+
+    <!-- Ambient Glowing Background Elements -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <!-- ==========================
+            Top Header
+    =========================== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Left Side: App Title -->
+            <div class="header-left flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-medical-dark via-medical-blue to-sky-500 text-white flex items-center justify-center shadow-lg shadow-medical-blue/25 ring-2 ring-white">
+                    <i class="fa-solid fa-hospital-user text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-tight flex items-center gap-2">
+                        Sepsis Clinical Decision Support System
+                    </h1>
+                    <p class="text-xs text-slate-500 font-medium">Early Sepsis Risk Assessment for Healthcare Professionals</p>
+                </div>
+            </div>
+
+            <!-- Right Side: Nav Buttons & Real-time Clock -->
+            <div class="header-right flex items-center gap-3 sm:gap-6">
+                
+                <nav class="flex items-center gap-2">
+                    <a href="/" class="nav-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-medical-blue hover:text-white transition-all duration-200 shadow-sm hover:shadow-md">
+                        <i class="fa-solid fa-house"></i>
+                        <span class="hidden sm:inline">Home</span>
+                    </a>
+
+                    <a href="/history" class="nav-btn inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-medical-blue hover:text-white transition-all duration-200 shadow-sm hover:shadow-md">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span class="hidden sm:inline">History</span>
+                    </a>
+                </nav>
+
+                <div class="h-8 w-px bg-slate-200 hidden md:block"></div>
+
+                <!-- Clock / Date Display -->
+                <div class="text-right hidden md:block">
+                    <div class="date text-[11px] font-bold text-slate-400 uppercase tracking-wider" id="currentDate"></div>
+                    <div class="time text-sm font-black text-medical-blue tracking-tight" id="currentTime"></div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================
+            Main Form Container
+    =========================== -->
+    <main class="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+
+        <div class="form-card bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl shadow-black/40 border border-white/20 overflow-hidden">
+            
+            <!-- Form Header Banner -->
+            <div class="relative bg-gradient-to-r from-slate-900 via-medical-dark to-medical-blue px-6 sm:px-8 py-7 text-white flex items-center justify-between overflow-hidden">
+                <div class="absolute inset-0 bg-header-glow opacity-60"></div>
+                <div class="relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-sky-200 text-xs font-semibold uppercase tracking-wider mb-2 border border-white/10">
+                        <i class="fa-solid fa-shield-halved text-sky-400"></i> Clinical Diagnostic Intake
+                    </div>
+                    <h2 class="text-xl sm:text-2xl font-black tracking-tight">Patient Clinical Information</h2>
+                    <p class="text-sky-100/90 text-xs sm:text-sm mt-1">Please enter all clinical parameters accurately to ensure precise prediction results.</p>
+                </div>
+                <div class="hidden sm:block text-5xl text-white/15 relative z-10">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                </div>
+            </div>
+
+            <form action="/predict" method="POST" class="p-6 sm:p-8 space-y-8">
+
+                <!-- SECTION 1: Patient Information -->
+                <div class="space-y-4">
+                    <div class="section-title border-b border-slate-200 pb-2.5 flex items-center gap-2.5 text-slate-800 font-bold text-lg">
+                        <span class="w-8 h-8 rounded-lg bg-medical-blue/10 text-medical-blue flex items-center justify-center text-sm shadow-inner">
+                            <i class="fa-solid fa-user-doctor"></i>
+                        </span>
+                        Patient Information
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        <!-- Patient Name -->
+                        <div class="input-group">
+                            <!-- Top Label with Inline Icon -->
+                            <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                                <i class="fa-regular fa-user text-medical-blue"></i>
+                                <span>Patient Name</span>
+                            </label>
+
+                            <!-- Clean Input Field -->
+                            <input type="text" name="patient_name" required placeholder="e.g. John Doe"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Hospital Name -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Hospital Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-hospital"></i>
+                                </span>
+                                <select name="hospital_name" required
+                                    class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white appearance-none shadow-sm">
+                                    <option value="">-- Select Hospital --</option>
+                                    
+                                    <!-- Tirunelveli -->
+                                    <optgroup label="Tirunelveli">
+                                        <option>Tirunelveli Medical College Hospital</option>
+                                        <option>Government Headquarters Hospital, Tirunelveli</option>
+                                        <option>Shifa Hospital, Tirunelveli</option>
+                                        <option>Annai Velankanni Hospital</option>
+                                        <option>Sudha Hospital, Tirunelveli</option>
+                                    </optgroup>
+
+                                    <!-- Chennai -->
+                                    <optgroup label="Chennai">
+                                        <option>Apollo Hospitals, Greams Road</option>
+                                        <option>MIOT International</option>
+                                        <option>Kauvery Hospital</option>
+                                        <option>Fortis Malar Hospital</option>
+                                        <option>SIMS Hospital</option>
+                                        <option>Sri Ramachandra Medical Centre</option>
+                                        <option>Gleneagles Global Hospital</option>
+                                    </optgroup>
+
+                                    <!-- Madurai -->
+                                    <optgroup label="Madurai">
+                                        <option>Government Rajaji Hospital</option>
+                                        <option>Apollo Speciality Hospital, Madurai</option>
+                                        <option>Velammal Medical College Hospital</option>
+                                    </optgroup>
+
+                                    <!-- Coimbatore -->
+                                    <optgroup label="Coimbatore">
+                                        <option>G. Kuppuswamy Naidu Memorial Hospital</option>
+                                        <option>PSG Hospitals</option>
+                                        <option>Kovai Medical Center and Hospital (KMCH)</option>
+                                    </optgroup>
+
+                                    <!-- Trichy -->
+                                    <optgroup label="Trichy">
+                                        <option>Mahatma Gandhi Memorial Government Hospital</option>
+                                        <option>Kauvery Hospital, Trichy</option>
+                                    </optgroup>
+
+                                    <option>Other</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Age -->
+                        <div class="input-group">
+                            <!-- Top Label with Inline Icon -->
+                            <label class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                                <i class="fa-solid fa-cake-candles text-medical-blue"></i>
+                                <span>Age</span>
+                            </label>
+                            
+                            <!-- Clean Input Field -->
+                            <input type="number" name="age" required placeholder="Years"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Gender</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-venus-mars"></i>
+                                </span>
+                                <select name="gender" required
+                                    class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white appearance-none shadow-sm">
+                                    <option value="">-- Select Gender --</option>
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                                <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-chevron-down text-xs"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Patient Medical History -->
+                <div class="space-y-4 pt-2">
+                    <div class="section-title border-b border-slate-200 pb-2.5 flex items-center gap-2.5 text-slate-800 font-bold text-lg">
+                        <span class="w-8 h-8 rounded-lg bg-medical-blue/10 text-medical-blue flex items-center justify-center text-sm shadow-inner">
+                            <i class="fa-solid fa-notes-medical"></i>
+                        </span>
+                        Patient History
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        
+                        <!-- Previous ICU History -->
+                        <div class="input-group bg-slate-50/90 p-4 rounded-xl border border-slate-200/80 hover:border-medical-blue/50 transition-all shadow-sm">
+                            <label class="block text-xs font-bold text-slate-700 mb-2">Previous ICU History</label>
+                            <select name="Previous_ICU_History" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue text-sm bg-white">
+                                <option value="">Select</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                        <!-- Hypertension -->
+                        <div class="input-group bg-slate-50/90 p-4 rounded-xl border border-slate-200/80 hover:border-medical-blue/50 transition-all shadow-sm">
+                            <label class="block text-xs font-bold text-slate-700 mb-2">Hypertension</label>
+                            <select name="Hypertension" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue text-sm bg-white">
+                                <option value="">Select</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                        <!-- Fever History -->
+                        <div class="input-group bg-slate-50/90 p-4 rounded-xl border border-slate-200/80 hover:border-medical-blue/50 transition-all shadow-sm">
+                            <label class="block text-xs font-bold text-slate-700 mb-2">Fever History</label>
+                            <select name="Fever_History" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue text-sm bg-white">
+                                <option value="">Select</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                        <!-- Mechanical Ventilation -->
+                        <div class="input-group bg-slate-50/90 p-4 rounded-xl border border-slate-200/80 hover:border-medical-blue/50 transition-all shadow-sm">
+                            <label class="block text-xs font-bold text-slate-700 mb-2">Mechanical Ventilation</label>
+                            <select name="Mechanical_Ventilation" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue text-sm bg-white">
+                                <option value="">Select</option>
+                                <option value="1">Yes</option>
+                                <option value="0">No</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Blood Investigation -->
+                <div class="space-y-4 pt-2">
+                    <div class="section-title border-b border-slate-200 pb-2.5 flex items-center gap-2.5 text-slate-800 font-bold text-lg">
+                        <span class="w-8 h-8 rounded-lg bg-medical-blue/10 text-medical-blue flex items-center justify-center text-sm shadow-inner">
+                            <i class="fa-solid fa-vial-virus"></i>
+                        </span>
+                        Blood Investigation
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        
+                        <!-- Hemoglobin -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Hemoglobin <span class="text-slate-400 font-normal lowercase">(g/dL)</span></label>
+                            <input type="number" step="any" name="Hemoglobin" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Lactate Level -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Lactate Level <span class="text-slate-400 font-normal lowercase">(mmol/L)</span></label>
+                            <input type="number" step="any" name="Lactate_Level" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Creatinine -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Creatinine <span class="text-slate-400 font-normal lowercase">(mg/dL)</span></label>
+                            <input type="number" step="any" name="Creatinine" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Blood Urea Nitrogen -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Blood Urea Nitrogen</label>
+                            <input type="number" step="any" name="Blood_Urea_Nitrogen" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Sodium -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Sodium <span class="text-slate-400 font-normal lowercase">(mEq/L)</span></label>
+                            <input type="number" step="any" name="Sodium" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- CRP -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">CRP</label>
+                            <input type="number" step="any" name="CRP" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Vital Signs -->
+                <div class="space-y-4 pt-2">
+                    <div class="section-title border-b border-slate-200 pb-2.5 flex items-center gap-2.5 text-slate-800 font-bold text-lg">
+                        <span class="w-8 h-8 rounded-lg bg-medical-blue/10 text-medical-blue flex items-center justify-center text-sm shadow-inner">
+                            <i class="fa-solid fa-heart-pulse"></i>
+                        </span>
+                        Vital Signs
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        
+                        <!-- Urine Output -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Urine Output <span class="text-slate-400 font-normal lowercase">(mL)</span></label>
+                            <input type="number" step="any" name="Urine_Output" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Systolic BP -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Systolic BP <span class="text-slate-400 font-normal lowercase">(mmHg)</span></label>
+                            <input type="number" step="any" name="Systolic_BP" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Diastolic BP -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Diastolic BP <span class="text-slate-400 font-normal lowercase">(mmHg)</span></label>
+                            <input type="number" step="any" name="Diastolic_BP" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- Oxygen Saturation -->
+                        <div class="input-group">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Oxygen Saturation <span class="text-slate-400 font-normal lowercase">(%)</span></label>
+                            <input type="number" step="any" name="Oxygen_Saturation" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                        <!-- PaO2 -->
+                        <div class="input-group sm:col-span-2 lg:col-span-1">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">PaO₂</label>
+                            <input type="number" step="any" name="PaO2" required placeholder="0.0"
+                                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-medical-blue focus:border-transparent text-sm transition-all bg-slate-50/50 focus:bg-white shadow-sm">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6 border-t border-slate-200">
+                    <button type="submit" class="w-full bg-gradient-to-r from-medical-blue via-medical-dark to-slate-900 hover:from-medical-dark hover:to-slate-900 text-white font-black py-4 rounded-xl shadow-xl shadow-medical-blue/25 hover:shadow-2xl hover:shadow-medical-blue/40 transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-3 uppercase tracking-wider text-sm ring-1 ring-white/20">
+                        <i class="fa-solid fa-magnifying-glass-chart text-lg"></i>
+                        Predict Sepsis Risk
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white/90 backdrop-blur-md border-t border-slate-200/80 py-4 text-center text-xs text-slate-600 font-medium mt-auto">
+        <p>© 2026 Sepsis AI Clinical Decision Support System. Confidential Healthcare Tool.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+{
+  "version": "1",
+  "workspaceId": "a95a949a0e81e3ba",
+  "workspaceName": "stepsis",
+  "enabled": true,
+  "updatedAt": "2026-07-31T08:46:00.547Z",
+  "detectedStack": {
+    "languages": [
+      "Python"
+    ],
+    "frameworks": [
+      "Flask"
+    ],
+    "packageManager": "pip",
+    "uiLibraries": [],
+    "orm": [],
+    "authLibraries": [],
+    "validationLibraries": [],
+    "paymentLibraries": [],
+    "testTools": [],
+    "scripts": {},
+    "importantDirs": [],
+    "sensitiveFiles": []
+  },
+  "sections": {
+    "stack": [
+      {
+        "id": "c1e8753bf0bbfcdc",
+        "text": "Python frameworks detected: Flask.",
+        "kind": "fact",
+        "source": "repo_detected",
+        "confidence": "confirmed",
+        "scope": "workspace",
+        "lastVerifiedAt": "2026-07-31T08:46:00.547Z"
+      }
+    ],
+    "packageManager": [],
+    "architectureRules": [],
+    "codingConventions": [],
+    "sensitiveFiles": [],
+    "forbiddenActions": [],
+    "allowedCommands": [],
+    "businessRules": [],
+    "integrationRules": [],
+    "testingExpectations": [],
+    "agentInstructions": [],
+    "openQuestions": []
+  }
+}
