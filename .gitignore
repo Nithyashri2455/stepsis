@@ -6,4 +6,7 @@ venv/
 .ipynb_checkpoints/
 *.joblib
 *.pkl
-
+/Patient_*.pdf
+/database/*.db
+/dataset/
+*.ipynb
